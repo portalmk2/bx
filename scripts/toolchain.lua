@@ -61,6 +61,7 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-clang",     "Linux (Clang compiler)"     },
 			{ "linux-clang-afl", "Linux (Clang + AFL fuzzer)" },
 			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
+			{ "linux-gcw0-gcc",  "Linux (GCW Zero, MIPS, GCC compiler)" },
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
@@ -328,7 +329,13 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "linux-mips-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-mips-gcc"))
-
+			
+		elseif "linux-gcw0-gcc" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "mipsel-gcw0-linux-uclibc-gcc"
+			premake.gcc.cxx = "mipsel-gcw0-linux-uclibc-g++"
+			premake.gcc.ar  = "mipsel-gcw0-linux-uclibc-ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-gcw0-gcc"))
+			
 		elseif "linux-arm-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-arm-gcc"))
 
@@ -792,6 +799,23 @@ function toolchain(_buildDir, _libDir)
 		linkoptions {
 			"-Wl,--gc-sections",
 		}
+		
+	configuration { "linux-gcw0-gcc" }
+		targetdir (path.join(_buildDir, "linux32_gcw0_gcc/bin"))
+		objdir (path.join(_buildDir, "linux32_gcw0_gcc/obj"))
+		libdirs { path.join(_libDir, "lib/linux32_gcw0_gcc") }
+		buildoptions {
+			"-Wunused-value",
+			"-Wundef",
+		}
+		links {
+			"rt",
+			"dl",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
+		
 
 	configuration { "linux-arm-gcc" }
 		targetdir (path.join(_buildDir, "linux32_arm_gcc/bin"))
@@ -800,6 +824,7 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
+			"--sysroot=/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot",
 		}
 		links {
 			"rt",
@@ -1240,10 +1265,16 @@ function strip()
 			"$(SILENT) $(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
 		}
 
-	configuration { "linux-* or rpi", "Release" }
+	configuration { "linux-* or rpi and not linux-gcw0-gcc", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) strip -s \"$(TARGET)\""
+		}
+		
+	configuration { "linux-gcw0-gcc", "Release" }
+		postbuildcommands {
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) mipsel-gcw0-linux-uclibc-strip -s \"$(TARGET)\""
 		}
 
 	configuration { "mingw*", "Release" }
