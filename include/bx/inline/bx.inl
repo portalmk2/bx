@@ -30,7 +30,11 @@ namespace bx
 	template<class Ty>
 	inline constexpr bool isTriviallyCopyable()
 	{
+#if __GNUG__ && __GNUC__ < 5
+		return __has_trivial_copy(Ty);
+#else
 		return __is_trivially_copyable(Ty);
+#endif
 	}
 
 	template<typename Ty>
