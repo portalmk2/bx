@@ -809,6 +809,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 			"--sysroot=/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot",
 		}
+		includedirs {
+			"/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot/usr/include",
+		}
 		links {
 			"rt",
 			"dl",
