@@ -807,6 +807,7 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
+			"--sysroot=/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot",
 		}
 		links {
 			"rt",
@@ -824,7 +825,6 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
-			"--sysroot=/opt/gcw0-toolchain/usr/mipsel-gcw0-linux-uclibc/sysroot",
 		}
 		links {
 			"rt",
